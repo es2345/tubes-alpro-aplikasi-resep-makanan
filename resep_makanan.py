@@ -2,38 +2,116 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import datetime
 
+class Resep:
+    def __init__(self, judul="", bahan=None, langkah="", waktu=0, tanggal=""):
+        self.judul = judul
+        self.bahan = bahan if bahan is not None else [""]*10  # Array statis bahan (max 10)
+        self.jumlah_bahan = 0
+        self.langkah = langkah
+        self.waktu = waktu
+        self.tanggal = tanggal
+
 class ResepMasakanApp:
+    MAX_RESEP = 100  # Batas maksimal resep
+    
     def __init__(self, root):
         self.root = root
         self.root.title("Aplikasi Resep Masakan Sederhana")
         self.root.geometry("800x600")
         
-        self.resep_data = [
-            {
-                "judul": "Nasi Goreng",
-                "bahan": ["nasi", "telur", "bawang merah", "kecap", "garam"],
-                "langkah": "1. Tumis bawang\n2. Masukkan nasi\n3. Tambahkan kecap",
-                "waktu": 20,
-                "tanggal": "2023-05-01"
-            },
-            {
-                "judul": "Mie Goreng",
-                "bahan": ["mie", "telur", "sawi", "kecap", "bawang putih"],
-                "langkah": "1. Rebus mie\n2. Tumis bumbu\n3. Campur dengan mie",
-                "waktu": 15,
-                "tanggal": "2023-05-02"
-            },
-                        {
-                "judul": "Nasi Cumi Hitam Pak Kris",
-                "bahan": ["nasi", "cumi-cumi", "sawi", "kecap", "bawang putih","saos tiram","msg"],
-                "langkah": "1. Rebus cumi\n2. Tumis bumbu\n3. Campur dengan cumi dan nasi\n4. Nikmati",
-                "waktu": 35,
-                "tanggal": "2023-05-02"
-            }
-        ]
+        # Array statis untuk resep
+        self.resep_data = [Resep() for _ in range(self.MAX_RESEP)]
+        self.jumlah_resep = 10  # Resep awal yang diisi
+        
+        # Inisialisasi resep awal
+        self._init_resep_awal()
+        
+        # Array untuk riwayat hapus
+        self.riwayat_hapus = [Resep() for _ in range(self.MAX_RESEP)]
+        self.jumlah_riwayat = 0
         
         self.setup_ui()
-        self.riwayat_hapus = []
+    
+    def _init_resep_awal(self):
+        # Resep 1
+        self.resep_data[0].judul = "Nasi Goreng"
+        self.resep_data[0].bahan = ["nasi", "telur", "bawang merah", "kecap", "garam"] + [""]*5
+        self.resep_data[0].jumlah_bahan = 5
+        self.resep_data[0].langkah = "1. Tumis bawang\n2. Masukkan nasi\n3. Tambahkan kecap"
+        self.resep_data[0].waktu = 20
+        self.resep_data[0].tanggal = "2023-05-01"
+        
+        # Resep 2
+        self.resep_data[1].judul = "Mie Goreng"
+        self.resep_data[1].bahan = ["mie", "telur", "sawi", "kecap", "bawang putih"] + [""]*5
+        self.resep_data[1].jumlah_bahan = 5
+        self.resep_data[1].langkah = "1. Rebus mie\n2. Tumis bumbu\n3. Campur dengan mie"
+        self.resep_data[1].waktu = 15
+        self.resep_data[1].tanggal = "2023-05-02"
+        
+        # Resep 3
+        self.resep_data[2].judul = "Nasi Cumi Hitam Pak Kris"
+        self.resep_data[2].bahan = ["nasi", "cumi-cumi", "sawi", "kecap", "bawang putih", "saos tiram", "msg"] + [""]*3
+        self.resep_data[2].jumlah_bahan = 7
+        self.resep_data[2].langkah = "1. Rebus cumi\n2. Tumis bumbu\n3. Campur dengan cumi dan nasi\n4. Nikmati"
+        self.resep_data[2].waktu = 35
+        self.resep_data[2].tanggal = "2023-05-02"
+        
+        # Resep 4
+        self.resep_data[3].judul = "Soto Ayam Lamongan"
+        self.resep_data[3].bahan = ["ayam", "bihun", "kol", "seledri", "bawang goreng", "koya", "jeruk nipis"] + [""]*3
+        self.resep_data[3].jumlah_bahan = 7
+        self.resep_data[3].langkah = "1. Rebus ayam dengan bumbu\n2. Saring kuah\n3. Sajikan dengan pelengkap"
+        self.resep_data[3].waktu = 60
+        self.resep_data[3].tanggal = "2023-05-03"
+
+        # Resep 5
+        self.resep_data[4].judul = "Rendang Daging Padang"
+        self.resep_data[4].bahan = ["daging sapi", "santan", "kelapa parut", "cabe merah", "bawang merah", "lengkuas", "daun jeruk"] + [""]*3
+        self.resep_data[4].jumlah_bahan = 7
+        self.resep_data[4].langkah = "1. Tumis bumbu halus\n2. Masukkan daging\n3. Masak hingga empuk dan kering"
+        self.resep_data[4].waktu = 180
+        self.resep_data[4].tanggal = "2023-05-04"
+
+        # Resep 6
+        self.resep_data[5].judul = "Gado-Gado Jakarta"
+        self.resep_data[5].bahan = ["lontong", "tahu", "tempe", "sayuran", "telur", "kerupuk", "bumbu kacang"] + [""]*3
+        self.resep_data[5].jumlah_bahan = 7
+        self.resep_data[5].langkah = "1. Rebus sayuran\n2. Goreng tahu/tempe\n3. Siram dengan bumbu kacang"
+        self.resep_data[5].waktu = 45
+        self.resep_data[5].tanggal = "2023-05-05"
+
+        # Resep 7
+        self.resep_data[6].judul = "Rawon Daging Sapi"
+        self.resep_data[6].bahan = ["daging sapi", "keluak", "daun bawang", "tauge", "sambal", "telur asin", "bawang goreng"] + [""]*3
+        self.resep_data[6].jumlah_bahan = 7
+        self.resep_data[6].langkah = "1. Rebus daging dengan bumbu\n2. Tambahkan keluak\n3. Sajikan dengan pelengkap"
+        self.resep_data[6].waktu = 90
+        self.resep_data[6].tanggal = "2023-05-06"
+
+        # Resep 8
+        self.resep_data[7].judul = "Pempek Palembang"
+        self.resep_data[7].bahan = ["ikan giling", "tepung sagu", "telur", "air", "garam", "cuka", "cuko"] + [""]*3
+        self.resep_data[7].jumlah_bahan = 7
+        self.resep_data[7].langkah = "1. Campur bahan adonan\n2. Bentuk pempek\n3. Rebus/goreng\n4. Sajikan dengan cuko"
+        self.resep_data[7].waktu = 75
+        self.resep_data[7].tanggal = "2023-05-07"
+
+        # Resep 9
+        self.resep_data[8].judul = "Bakso Malang"
+        self.resep_data[8].bahan = ["daging sapi", "tepung tapioka", "bawang putih", "garam", "mi kuning", "tahu", "kuah kaldu"] + [""]*3
+        self.resep_data[8].jumlah_bahan = 7
+        self.resep_data[8].langkah = "1. Buat adonan bakso\n2. Rebus bulatan bakso\n3. Sajikan dengan mi dan kuah"
+        self.resep_data[8].waktu = 65
+        self.resep_data[8].tanggal = "2023-05-08"
+
+        # Resep 10
+        self.resep_data[9].judul = "Sate Madura"
+        self.resep_data[9].bahan = ["daging ayam", "kacang tanah", "kecap", "bawang merah", "jeruk limau", "lontong", "sambal"] + [""]*3
+        self.resep_data[9].jumlah_bahan = 7
+        self.resep_data[9].langkah = "1. Tusuk daging\n2. Bakar sate\n3. Sajikan dengan bumbu kacang"
+        self.resep_data[9].waktu = 50
+        self.resep_data[9].tanggal = "2023-05-09"
     
     def setup_ui(self):
         # Frame utama
@@ -92,325 +170,186 @@ class ResepMasakanApp:
         ttk.Button(button_frame, text="Hapus Resep", command=self.hapus_resep).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="Riwayat Hapus", command=self.tampilkan_riwayat_hapus).pack(side=tk.LEFT, padx=5)
         
-        # Memuat data awal2
-        self.tampilkan_daftar_resep(self.resep_data)
-    
-##############################################################################################################################
-    
-    def tampilkan_daftar_resep(self, resep_list):
+        self.tampilkan_daftar_resep()
+        
+    def tampilkan_daftar_resep(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
-            
-        for resep in resep_list:
-            bahan_utama = ", ".join(resep["bahan"][:2]) + ("..." if len(resep["bahan"]) > 2 else "") #hiasan untuk tampilan yg lebih dri 2 bahan
+        
+        for i in range(self.jumlah_resep):
+            resep = self.resep_data[i]
+            bahan_utama = ", ".join(resep.bahan[:2]) + ("..." if resep.jumlah_bahan > 2 else "")
             self.tree.insert("", tk.END, values=(
-                resep["judul"],
+                resep.judul,
                 bahan_utama,
-                resep["waktu"],
-                resep["tanggal"]
+                resep.waktu,
+                resep.tanggal
             ))
     
-##############################################################################################################################
-
-    def tampilkan_detail_resep(self, event=None):
-        selected_item = self.tree.focus()
-        if not selected_item:
-            return
-        
-        item_data = self.tree.item(selected_item)
-        judul = item_data["values"][0]
-        
-        # Cari resep yang sesuai
-        resep = next((r for r in self.resep_data if r["judul"] == judul), None)
-        if not resep:
-            return
-        
-        # Buat window detail
-        detail_window = tk.Toplevel(self.root)
-        detail_window.title(f"Detail Resep: {judul}")
-        detail_window.geometry("600x400")
-        
-        # Frame detail
-        detail_frame = ttk.Frame(detail_window, padding="10")
-        detail_frame.pack(fill=tk.BOTH, expand=True)
-        
-        # Judul
-        ttk.Label(detail_frame, text=resep["judul"], font=("Arial", 14, "bold")).pack(pady=5)
-        
-        # Bahan-bahan
-        bahan_frame = ttk.LabelFrame(detail_frame, text="Bahan-bahan", padding="10")
-        bahan_frame.pack(fill=tk.X, pady=5)
-        
-        for bahan in resep["bahan"]:
-            ttk.Label(bahan_frame, text=f"- {bahan}").pack(anchor=tk.W)
-        
-        # Langkah-langkah
-        langkah_frame = ttk.LabelFrame(detail_frame, text="Langkah-langkah", padding="10")
-        langkah_frame.pack(fill=tk.BOTH, expand=True, pady=5)
-        
-        langkah_text = tk.Text(langkah_frame, wrap=tk.WORD, height=10)
-        langkah_text.insert(tk.END, resep["langkah"])
-        langkah_text.config(state=tk.DISABLED)
-        langkah_text.pack(fill=tk.BOTH, expand=True)
-        
-        # Info tambahan
-        info_frame = ttk.Frame(detail_frame)
-        info_frame.pack(fill=tk.X, pady=5)
-        
-        ttk.Label(info_frame, text=f"Waktu memasak: {resep['waktu']} menit").pack(side=tk.LEFT)
-        ttk.Label(info_frame, text=f"Ditambahkan pada: {resep['tanggal']}", padding=(10, 0)).pack(side=tk.LEFT)
-        
-##############################################################################################################################
-
     def cari_resep(self):
         keyword = self.search_entry.get().lower()
         search_type = self.search_type.get()
-        
+    
         if not keyword:
-            self.tampilkan_daftar_resep(self.resep_data)
+            self.tampilkan_daftar_resep()
             return
-        
-        hasil_pencarian = []
-        for resep in self.resep_data:
-            if search_type == "judul" and keyword in resep["judul"].lower():
-                hasil_pencarian.append(resep)
-            elif search_type == "bahan" and any(keyword in bahan.lower() for bahan in resep["bahan"]):
-                hasil_pencarian.append(resep)
-        
-        self.tampilkan_daftar_resep(hasil_pencarian)
-        
-##############################################################################################################################
 
-##############################################################################################################################
-
+        hasil = [0] * self.MAX_RESEP
+        jumlah_hasil = 0
+    
+        for i in range(self.jumlah_resep):
+            resep = self.resep_data[i]
+            found = False
+        
+            if search_type == "judul":
+                if keyword in resep.judul.lower():
+                    found = True
+            elif search_type == "bahan":
+                for j in range(resep.jumlah_bahan):
+                    if keyword in resep.bahan[j].lower():
+                        found = True
+                        break
+        
+            if found and jumlah_hasil < self.MAX_RESEP:
+                hasil[jumlah_hasil] = i
+                jumlah_hasil += 1
+    
+    # Tampilkan hasil
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+        
+        for k in range(jumlah_hasil):
+            idx = hasil[k]
+            resep = self.resep_data[idx]
+            bahan_utama = ", ".join(resep.bahan[:2]) + ("..." if resep.jumlah_bahan > 2 else "")
+            self.tree.insert("", tk.END, values=(
+                resep.judul,
+                bahan_utama,
+                resep.waktu,
+                resep.tanggal
+            ))
+    
+    def tampilkan_detail_resep(self, event):
+        selected_item = self.tree.selection()
+        if not selected_item:
+            return
+            
+        item = self.tree.item(selected_item[0])
+        judul = item['values'][0]
+        
+        for resep in self.resep_data[:self.jumlah_resep]:
+            if resep.judul == judul:
+                detail = f"Judul: {resep.judul}\n\n"
+                detail += f"Bahan:\n- " + "\n- ".join(resep.bahan[:resep.jumlah_bahan]) + "\n\n"
+                detail += f"Langkah:\n{resep.langkah}\n\n"
+                detail += f"Waktu: {resep.waktu} menit\n"
+                detail += f"Tanggal: {resep.tanggal}"
+                
+                messagebox.showinfo("Detail Resep", detail)
+                break
+    
     def urutkan_resep(self):
         sort_type = self.sort_type.get()
-    
+        
         if sort_type == "judul":
-            sorted_resep = self.quick_sort_str(self.resep_data.copy(), key=lambda x: x["judul"])
+            #berdasarkan judul 
+            for i in range(self.jumlah_resep - 1):
+                for j in range(self.jumlah_resep - i - 1):
+                    if self.resep_data[j].judul.lower() > self.resep_data[j+1].judul.lower():
+                        self.resep_data[j], self.resep_data[j+1] = self.resep_data[j+1], self.resep_data[j]
         elif sort_type == "waktuC":
-            sorted_resep = self.quick_sort_asc(self.resep_data.copy(), key=lambda x: x["waktu"])
+            #berdasarkan waktu (tercepat)
+            for i in range(self.jumlah_resep - 1):
+                for j in range(self.jumlah_resep - i - 1):
+                    if self.resep_data[j].waktu > self.resep_data[j+1].waktu:
+                        self.resep_data[j], self.resep_data[j+1] = self.resep_data[j+1], self.resep_data[j]
         elif sort_type == "waktuL":
-            sorted_resep = self.quick_sort_desc(self.resep_data.copy(), key=lambda x: x["waktu"])
-        else:
-            sorted_resep = self.resep_data.copy()
+            #berdasarkan waktu (terlama)
+            for i in range(self.jumlah_resep - 1):
+                for j in range(self.jumlah_resep - i - 1):
+                    if self.resep_data[j].waktu < self.resep_data[j+1].waktu:
+                        self.resep_data[j], self.resep_data[j+1] = self.resep_data[j+1], self.resep_data[j]
+        
+        self.tampilkan_daftar_resep()
     
-        self.tampilkan_daftar_resep(sorted_resep)
-
-    def quick_sort_str(self, data, key=lambda x: x):
-        """Quick Sort untuk string (case-insensitive ascending)"""
-        if len(data) <= 1:
-            return data
-    
-        pivot = data[len(data) // 2]
-        left = [x for x in data if key(x).lower() < key(pivot).lower()]
-        middle = [x for x in data if key(x).lower() == key(pivot).lower()]
-        right = [x for x in data if key(x).lower() > key(pivot).lower()]
-    
-        return self.quick_sort_str(left, key) + middle + self.quick_sort_str(right, key)
-
-    def quick_sort_asc(self, data, key=lambda x: x):
-        """Quick Sort untuk angka (ascending)"""
-        if len(data) <= 1:
-            return data
-    
-        pivot = data[len(data) // 2]
-        left = [x for x in data if key(x) < key(pivot)]
-        middle = [x for x in data if key(x) == key(pivot)]
-        right = [x for x in data if key(x) > key(pivot)]
-    
-        return self.quick_sort_asc(left, key) + middle + self.quick_sort_asc(right, key)
-
-    def quick_sort_desc(self, data, key=lambda x: x):
-        """Quick Sort untuk angka (descending)"""
-        if len(data) <= 1:
-            return data
-    
-        pivot = data[len(data) // 2]
-        left = [x for x in data if key(x) > key(pivot)]
-        middle = [x for x in data if key(x) == key(pivot)]
-        right = [x for x in data if key(x) < key(pivot)]
-    
-        return self.quick_sort_desc(left, key) + middle + self.quick_sort_desc(right, key)
-    
-##############################################################################################################################
-
-##############################################################################################################################
-
-    #CREATE
     def tambah_resep(self):
-        self.form_resep_window("Tambah Resep Baru")
-    #UPDATE
+        self._show_resep_form(is_edit=False)
+
     def edit_resep(self):
-        selected_item = self.tree.focus()
+        selected_item = self.tree.selection()
         if not selected_item:
-            messagebox.showwarning("Peringatan", "Silakan pilih resep yang akan diedit")
+            messagebox.showwarning("Peringatan", "Pilih resep yang akan diedit!")
             return
-        
-        item_data = self.tree.item(selected_item)
-        judul = item_data["values"][0]
-        
-        resep = next((r for r in self.resep_data if r["judul"].lower() == judul.lower()), None)
-        if not resep:
-            return
-        
-        self.form_resep_window("Edit Resep", resep)
-    #DELETE
-    def hapus_resep(self):
-        selected_item = self.tree.focus()
-        if not selected_item:
-            messagebox.showwarning("Peringatan", "Silakan pilih resep yang akan dihapus")
-            return
-        
-        item_data = self.tree.item(selected_item)
-        judul = item_data["values"][0]        
-
-        if messagebox.askyesno("Konfirmasi", f"Apakah Anda yakin ingin menghapus resep '{judul}'?"):
-            # Cari resep yang akan dihapus
-            resep_dihapus = next((r for r in self.resep_data if r["judul"] == judul), None)
             
-            if resep_dihapus:
-                # Pindahkan ke riwayat hapus
-                self.riwayat_hapus.append(resep_dihapus)
-                
-                # Hapus dari data aktif
-                self.resep_data = [r for r in self.resep_data if r["judul"] != judul]
-                self.tampilkan_daftar_resep(self.resep_data)
-                messagebox.showinfo("Info", "Resep berhasil dihapus")
+        item = self.tree.item(selected_item[0])
+        judul = item['values'][0]
+        self._show_resep_form(is_edit=True, old_judul=judul)
 
-    def form_resep_window(self, title, resep=None):
-        is_edit = resep is not None
-        
+    def _show_resep_form(self, is_edit, old_judul=None):
         form_window = tk.Toplevel(self.root)
-        form_window.title(title)
-        form_window.geometry("500x600")
+        form_window.title("Edit Resep" if is_edit else "Tambah Resep")
+        form_window.geometry("500x400")
+        
+        # Cari resep yang akan diedit
+        resep_to_edit = None
+        if is_edit:
+            for resep in self.resep_data[:self.jumlah_resep]:
+                if resep.judul == old_judul:
+                    resep_to_edit = resep
+                    break
         
         # Frame form
         form_frame = ttk.Frame(form_window, padding="10")
         form_frame.pack(fill=tk.BOTH, expand=True)
         
         # Judul
-        ttk.Label(form_frame, text="Judul Resep:").pack(anchor=tk.W, pady=(5, 0))
+        ttk.Label(form_frame, text="Judul Resep:").grid(row=0, column=0, sticky=tk.W, pady=5)
         judul_entry = ttk.Entry(form_frame, width=40)
-        judul_entry.pack(fill=tk.X, pady=(0, 10))
+        judul_entry.grid(row=0, column=1, pady=5)
         
-        # Bahan-bahan
-        ttk.Label(form_frame, text="Bahan-bahan (pisahkan dengan koma):").pack(anchor=tk.W, pady=(5, 0))
-        bahan_text = tk.Text(form_frame, height=5, wrap=tk.WORD)
-        bahan_text.pack(fill=tk.X, pady=(0, 10))
+        # Bahan
+        ttk.Label(form_frame, text="Bahan (pisahkan dengan koma):").grid(row=1, column=0, sticky=tk.W, pady=5)
+        bahan_entry = tk.Text(form_frame, width=40, height=5)
+        bahan_entry.grid(row=1, column=1, pady=5)
         
-        # Langkah-langkah
-        ttk.Label(form_frame, text="Langkah-langkah:").pack(anchor=tk.W, pady=(5, 0))
-        langkah_text = tk.Text(form_frame, height=10, wrap=tk.WORD)
-        langkah_text.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        # Langkah
+        ttk.Label(form_frame, text="Langkah Pembuatan:").grid(row=2, column=0, sticky=tk.W, pady=5)
+        langkah_entry = tk.Text(form_frame, width=40, height=8)
+        langkah_entry.grid(row=2, column=1, pady=5)
         
-        # Waktu masak
-        waktu_frame = ttk.Frame(form_frame)
-        waktu_frame.pack(fill=tk.X, pady=(0, 10))
+        # Waktu
+        ttk.Label(form_frame, text="Waktu Masak (menit):").grid(row=3, column=0, sticky=tk.W, pady=5)
+        waktu_entry = ttk.Entry(form_frame, width=10)
+        waktu_entry.grid(row=3, column=1, sticky=tk.W, pady=5)
         
-        ttk.Label(waktu_frame, text="Waktu masak (menit):").pack(side=tk.LEFT)
-        waktu_entry = ttk.Entry(waktu_frame, width=10)
-        waktu_entry.pack(side=tk.LEFT, padx=5)
+        # Isi form jika edit
+        if is_edit and resep_to_edit:
+            judul_entry.insert(0, resep_to_edit.judul)
+            bahan_entry.insert(tk.END, ", ".join(resep_to_edit.bahan[:resep_to_edit.jumlah_bahan]))
+            langkah_entry.insert(tk.END, resep_to_edit.langkah)
+            waktu_entry.insert(0, str(resep_to_edit.waktu))
         
-        # Tombol simpan/batal
-        button_frame = ttk.Frame(form_frame)
-        button_frame.pack(fill=tk.X, pady=10)
-        
-        #simpan resep
-        ttk.Button(button_frame, text="Simpan", command=lambda: self.simpan_resep(
-            form_window,
-            judul_entry.get(),
-            bahan_text.get("1.0", tk.END).strip(),
-            langkah_text.get("1.0", tk.END).strip(),
-            waktu_entry.get(),
-            is_edit,
-            resep["judul"] if is_edit else None
-        )).pack(side=tk.RIGHT, padx=5)
-        
-        ttk.Button(button_frame, text="Batal", command=form_window.destroy).pack(side=tk.RIGHT)
-        
-        #tampilin data klo lagi ngedit
-        if is_edit:
-            judul_entry.insert(0, resep["judul"])
-            bahan_text.insert(tk.END, ", ".join(resep["bahan"]))
-            langkah_text.insert(tk.END, resep["langkah"])
-            waktu_entry.insert(0, str(resep["waktu"]))
-
-    def tampilkan_riwayat_hapus(self):
-        if not self.riwayat_hapus:
-            messagebox.showinfo("Info", "Tidak ada resep yang dihapus")
-            return
-            
-        # Buat window baru untuk menampilkan riwayat
-        riwayat_window = tk.Toplevel(self.root)
-        riwayat_window.title("Riwayat Resep Dihapus")
-        riwayat_window.geometry("600x400")
-        
-        # Frame untuk daftar resep dihapus
-        list_frame = ttk.Frame(riwayat_window, padding="10")
-        list_frame.pack(fill=tk.BOTH, expand=True)
-        
-        # Treeview untuk menampilkan resep dihapus
-        tree = ttk.Treeview(list_frame, columns=("Judul", "Waktu", "Tanggal"), show="headings")
-        tree.heading("Judul", text="Judul")
-        tree.heading("Waktu", text="Waktu (menit)")
-        tree.heading("Tanggal", text="Tanggal Ditambahkan")
-        
-        tree.column("Judul", width=200)
-        tree.column("Waktu", width=100)
-        tree.column("Tanggal", width=100)
-        
-        tree.pack(fill=tk.BOTH, expand=True)
-        
-        # Isi data
-        for resep in self.riwayat_hapus:
-            tree.insert("", tk.END, values=(
-                resep["judul"],
-                resep["waktu"],
-                resep["tanggal"]
-            ))
-        
-        # Frame untuk tombol aksi
-        button_frame = ttk.Frame(riwayat_window)
-        button_frame.pack(fill=tk.X, pady=5)
-        
-        # Tombol restore
-        ttk.Button(button_frame, text="Restore Resep", 
-                  command=lambda: self.restore_resep(tree)).pack(side=tk.LEFT, padx=5)
-        
-        ttk.Button(button_frame, text="Tutup", 
-                  command=riwayat_window.destroy).pack(side=tk.RIGHT, padx=5)
-
-    def restore_resep(self, tree):
-        selected_item = tree.focus()
-        if not selected_item:
-            messagebox.showwarning("Peringatan", "Silakan pilih resep yang akan dikembalikan")
-            return
-            
-        item_data = tree.item(selected_item)
-        judul = item_data["values"][0]
-        
-        resep = next((r for r in self.riwayat_hapus if r["judul"] == judul), None)
-        
-        if resep:
-            self.resep_data.append(resep)
-
-            self.riwayat_hapus = [r for r in self.riwayat_hapus if r["judul"] != judul]
-            
-            self.tampilkan_daftar_resep(self.resep_data)
-
-            if not self.riwayat_hapus:
-                tree.master.destroy()
-                
-            messagebox.showinfo("Info", f"Resep '{judul}' berhasil dikembalikan")
-            
-##############################################################################################################################
+        # Tombol simpan
+        save_button = ttk.Button(
+            form_frame, 
+            text="Simpan", 
+            command=lambda: self.simpan_resep(
+                form_window,
+                judul_entry.get(),
+                bahan_entry.get("1.0", tk.END),
+                langkah_entry.get("1.0", tk.END),
+                waktu_entry.get(),
+                is_edit,
+                old_judul
+            )
+        )
+        save_button.grid(row=4, column=1, sticky=tk.E, pady=10)
     
-
+    
     
     def simpan_resep(self, window, judul, bahan_str, langkah, waktu_str, is_edit, old_judul=None):
-
-        if not judul or not bahan_str or not langkah or not waktu_str:
+        # Validasi input
+        if not judul or not bahan_str.strip() or not langkah.strip() or not waktu_str:
             messagebox.showwarning("Peringatan", "Semua field harus diisi!")
             return
         
@@ -422,39 +361,112 @@ class ResepMasakanApp:
             messagebox.showwarning("Peringatan", "Waktu masak harus berupa angka positif!")
             return
         
-        bahan_list = [b.strip() for b in bahan_str.split(",") if b.strip()]
-        if not bahan_list:
+        # Konversi bahan ke array statis
+        bahan_array = [""]*10
+        bahan_input = [b.strip() for b in bahan_str.split(",") if b.strip()]
+        if not bahan_input:
             messagebox.showwarning("Peringatan", "Masukkan minimal satu bahan!")
             return
         
-        if (not is_edit and any(r["judul"].lower() == judul.lower() for r in self.resep_data)) or \
-           (is_edit and judul.lower() != old_judul.lower() and any(r["judul"].lower() == judul.lower() for r in self.resep_data)):
-            messagebox.showwarning("Peringatan", "Resep dengan judul tersebut sudah ada!")
-            return
+        jumlah_bahan = min(len(bahan_input), 10)  # Maksimal 10 bahan
+        for i in range(jumlah_bahan):
+            bahan_array[i] = bahan_input[i]
         
-        resep_baru = {
-            "judul": judul,
-            "bahan": bahan_list,
-            "langkah": langkah,
-            "waktu": waktu,
-            "tanggal": datetime.now().strftime("%Y-%m-%d")
-        }
+        # Cek duplikasi judul
+        for i in range(self.jumlah_resep):
+            if (not is_edit and self.resep_data[i].judul.lower() == judul.lower()) or \
+               (is_edit and judul.lower() != old_judul.lower() and 
+                self.resep_data[i].judul.lower() == judul.lower()):
+                messagebox.showwarning("Peringatan", "Resep dengan judul tersebut sudah ada!")
+                return
         
         if is_edit:
-            #Edit resep
-            for i, resep in enumerate(self.resep_data):
-                if resep["judul"] == old_judul:
-                    self.resep_data[i] = resep_baru
+            # Edit resep yang ada
+            for i in range(self.jumlah_resep):
+                if self.resep_data[i].judul == old_judul:
+                    self.resep_data[i].judul = judul
+                    self.resep_data[i].bahan = bahan_array
+                    self.resep_data[i].jumlah_bahan = jumlah_bahan
+                    self.resep_data[i].langkah = langkah.strip()
+                    self.resep_data[i].waktu = waktu
                     break
             messagebox.showinfo("Info", "Resep berhasil diperbarui")
         else:
-            #Tambah resep 
-            self.resep_data.append(resep_baru)
+            # Tambah resep baru
+            if self.jumlah_resep >= self.MAX_RESEP:
+                messagebox.showerror("Error", "Batas maksimal resep telah tercapai")
+                return
+                
+            self.resep_data[self.jumlah_resep].judul = judul
+            self.resep_data[self.jumlah_resep].bahan = bahan_array
+            self.resep_data[self.jumlah_resep].jumlah_bahan = jumlah_bahan
+            self.resep_data[self.jumlah_resep].langkah = langkah.strip()
+            self.resep_data[self.jumlah_resep].waktu = waktu
+            self.resep_data[self.jumlah_resep].tanggal = datetime.now().strftime("%Y-%m-%d")
+            self.jumlah_resep += 1
             messagebox.showinfo("Info", "Resep baru berhasil ditambahkan")
         
         window.destroy()
-        self.tampilkan_daftar_resep(self.resep_data)
+        self.tampilkan_daftar_resep()
 
+    def hapus_resep(self):
+        selected_item = self.tree.selection()
+        if not selected_item:
+            messagebox.showwarning("Peringatan", "Pilih resep yang akan dihapus!")
+            return
+            
+        item = self.tree.item(selected_item[0])
+        judul = item['values'][0]
+        
+        for i in range(self.jumlah_resep):
+            if self.resep_data[i].judul == judul:
+
+                self.riwayat_hapus[self.jumlah_riwayat] = self.resep_data[i]
+                self.jumlah_riwayat += 1
+                
+                for j in range(i, self.jumlah_resep-1):
+                    self.resep_data[j] = self.resep_data[j+1]
+                
+                self.jumlah_resep -= 1
+                self.tampilkan_daftar_resep()
+                messagebox.showinfo("Info", "Resep berhasil dihapus")
+                return
+        
+        messagebox.showwarning("Peringatan", "Resep tidak ditemukan!")
+
+    def tampilkan_riwayat_hapus(self):
+        if self.jumlah_riwayat == 0:
+            messagebox.showinfo("Info", "Tidak ada riwayat penghapusan")
+            return
+        
+        riwayat_window = tk.Toplevel(self.root)
+        riwayat_window.title("Riwayat Penghapusan Resep")
+        riwayat_window.geometry("600x400")
+        
+        tree = ttk.Treeview(riwayat_window, columns=("Judul", "Bahan", "Waktu", "Tanggal"), show="headings")
+        tree.heading("Judul", text="Judul")
+        tree.heading("Bahan", text="Bahan Utama")
+        tree.heading("Waktu", text="Waktu (menit)")
+        tree.heading("Tanggal", text="Tanggal Ditambahkan")
+        
+        tree.column("Judul", width=150)
+        tree.column("Bahan", width=150)
+        tree.column("Waktu", width=80)
+        tree.column("Tanggal", width=100)
+        
+        tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        for i in range(self.jumlah_riwayat):
+            resep = self.riwayat_hapus[i]
+            bahan_utama = ", ".join(resep.bahan[:2]) + ("..." if resep.jumlah_bahan > 2 else "")
+            tree.insert("", tk.END, values=(
+                resep.judul,
+                bahan_utama,
+                resep.waktu,
+                resep.tanggal
+            ))
+
+        
 if __name__ == "__main__":
     root = tk.Tk()
     app = ResepMasakanApp(root)
